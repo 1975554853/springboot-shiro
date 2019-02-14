@@ -1,6 +1,7 @@
 package com.hmb.springbootshiro.view;
 
 import com.hmb.springbootshiro.pojo.Page;
+import com.hmb.springbootshiro.pojo.User;
 import com.hmb.springbootshiro.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -13,6 +14,7 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -26,6 +28,10 @@ public class UserController {
 
     @GetMapping("/login")
     public Page login(String username,String password) throws UnsupportedEncodingException {
+        User user=userService.selectUser(username);
+        if (user ==null){
+            throw new NullPointerException();
+        }
         Subject currentUser = SecurityUtils.getSubject();
         Map<Integer,String> map = new HashMap<>();
         if (!currentUser.isAuthenticated()) {
@@ -46,6 +52,14 @@ public class UserController {
         }
         return new Page(200,"登录成功",0,null);
 
+    }
+    @RequestMapping("/test")
+    public void test(ModelMap modelMap){
+        System.out.println(modelMap.get("author"));
+    }
+    @RequestMapping("/test1")
+    public void test1(@ModelAttribute("author") String author ){
+        System.out.println(author);
     }
     @RequestMapping("/addUser")
     public boolean addUser(String username,String password){
